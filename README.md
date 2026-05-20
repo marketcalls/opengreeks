@@ -12,26 +12,25 @@ pip install opengreeks
 
 OpenGreeks reimplements the Black-76, Black-Scholes, and Black-Scholes-Merton pricing paths in zero-dependency Rust, exposed through PyO3 with the **same function names and signatures** as `py_vollib` / `vollib`. Migration is a one-line import swap; the math is unchanged.
 
-### Headline speedups vs `py_vollib==1.0.1`
+### Headline speedups vs `vollib==1.0.7` (latest canonical)
 
-| Workload | py_vollib | OpenGreeks | Speedup |
+| Workload | vollib 1.0.7 | OpenGreeks | Speedup |
 |---|---:|---:|---:|
-| Implied volatility, single call | 27.7 µs | **0.50 µs** | **55×** |
-| Black-76 chain — vega × 177 strikes | 262 µs | **4.3 µs** | **61×** |
-| Black-76 chain — all-5 Greeks × 200 options | ~3.5 ms | **~45 µs** | **~80×** |
-| Black-76 chain — IV × 177 strikes | 4.22 ms | **0.26 ms** | **16×** |
-| Black-76 price (scalar) | 3.83 µs | 0.33 µs | 11× |
-| Black-76 theta (scalar) | 5.79 µs | 0.33 µs | 17× |
-| Black-Scholes IV (scalar) | 17.8 µs | 0.50 µs | 35× |
-| BSM IV (scalar) | 17.7 µs | 0.50 µs | 35× |
+| Black-76 chain — vega × 177 strikes | 795 µs | **4.3 µs** | **183×** |
+| Black-76 chain — delta × 177 strikes | 695 µs | **6.3 µs** | **110×** |
+| Black-76 chain — all-5 Greeks × 200 options | ~4.2 ms | **~45 µs** | **~94×** |
+| Black-76 chain — price × 177 strikes | 812 µs | **9.4 µs** | **86×** |
+| Implied volatility, single call | 28.75 µs | **0.50 µs** | **58×** |
+| Black-76 IV × 177-strike chain | 4.37 ms | **0.26 ms** | **17×** |
+| Black-76 theta (scalar) | 11.38 µs | 0.33 µs | 34× |
+| Black-Scholes IV (scalar) | 18.88 µs | 0.50 µs | 38× |
+| BSM IV (scalar) | 18.83 µs | 0.50 µs | 38× |
 
-Against `vollib==1.0.7` (latest canonical) the wins grow further on Greeks chains: **delta 110×**, **vega 183×**, **delta on BSM chain 95×** (vollib 1.0.7 added domain-check overhead that opengreeks skips).
-
-A full NIFTY option chain refresh (~200 options, all 5 Greeks + IV) drops from **~5 ms in py_vollib** to **~50 µs in OpenGreeks** — the difference between "saturates a core at 100 Hz" and "uses 6% of one core."
+A full NIFTY option chain refresh (~200 options, all 5 Greeks + IV) drops from **~9 ms in vollib** to **~0.3 ms in OpenGreeks** — the difference between "saturates a core at 100 Hz" and "uses ~3% of one core."
 
 ### Parity that lets you trust the swap
 
-**29 edge cases × 3 models × 7 functions each**, validated against **both** `py_vollib==1.0.1` and `vollib==1.0.7`:
+**29 edge cases × 3 models × 7 functions each**, validated against `vollib==1.0.7`:
 
 | Greek | max abs error vs vollib |
 |---|---|
@@ -150,16 +149,16 @@ The aliases (`as black_iv` etc.) keep the rest of your code unchanged.
 Want to verify the speedups on your hardware before you commit? Two-command repro:
 
 ```bash
-# Install the OpenAlgo production baseline + opengreeks itself
-pip install py_vollib==1.0.1 py_lets_be_rational==1.0.1 numpy maturin opengreeks
+# Install the baseline + opengreeks itself
+pip install 'vollib>=1.0.7' 'py_lets_be_rational>=1.0.1' numpy opengreeks
 
 # Run the bench against your CPU
 python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/marketcalls/opengreeks/main/bench/bench_parity.py').read())"
 ```
 
-Or clone the repo and run [`bench/bench_parity.py`](bench/bench_parity.py) — it auto-detects whichever vollib version is installed and prints a full parity + performance report in 30 seconds. Headline numbers above are reproducible.
+Or clone the repo and run [`bench/bench_parity.py`](bench/bench_parity.py) — prints a full parity + performance report in ~30 seconds. Headline numbers above are reproducible.
 
-Full report including all 29 edge cases, dual-version comparison, and chain-wide tables: [`bench/RESULTS.md`](bench/RESULTS.md).
+Full report including all 29 edge cases and chain-wide tables: [`bench/RESULTS.md`](bench/RESULTS.md).
 
 ---
 
@@ -210,7 +209,7 @@ pip install target/wheels/opengreeks-*.whl
 cargo test --release
 
 # Python parity + performance bench
-pip install py_vollib==1.0.1 py_lets_be_rational==1.0.1 numpy
+pip install 'vollib>=1.0.7' 'py_lets_be_rational>=1.0.1' numpy
 python bench/bench_parity.py
 ```
 
