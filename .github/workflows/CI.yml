@@ -11,12 +11,8 @@ on:
 permissions:
   contents: read
 
-defaults:
-  run:
-    working-directory: black76
-
 jobs:
-  # ---------- Fast PR feedback: cargo test on the zero-dep Rust core ----------
+  # ---------- Fast PR feedback: cargo test on the zero-dep Rust cores ----------
   rust-test:
     name: Rust core tests
     runs-on: ubuntu-latest
@@ -24,11 +20,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: cargo test (black76_rust)
-        working-directory: black76_rust
-        run: cargo test --release
+      - name: cargo test (black76_rust + bsm_rust)
+        run: cargo test --release -p black76_rust -p bsm_rust
 
-  # ---------- Parity test on Linux: build the wheel, install, run bench against py_vollib ----------
+  # ---------- Parity test on Linux: build the wheel, install, run bench ----------
   parity-linux:
     name: Parity vs py_vollib (Linux)
     runs-on: ubuntu-latest
@@ -48,17 +43,17 @@ jobs:
 
   # ---------- Build abi3 wheels for all target platforms ----------
   build-wheels:
-    name: Wheel ${{ matrix.target }}
+    name: Wheel ${{ matrix.os }} ${{ matrix.target }}
     needs: rust-test
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest,  target: x86_64,        manylinux: '2_17' }
-          - { os: ubuntu-latest,  target: aarch64,       manylinux: '2_17' }
-          - { os: macos-13,       target: x86_64,        manylinux: '' }
-          - { os: macos-14,       target: aarch64,       manylinux: '' }
-          - { os: windows-latest, target: x64,           manylinux: '' }
+          - { os: ubuntu-latest,  target: x86_64,  manylinux: '2_17' }
+          - { os: ubuntu-latest,  target: aarch64, manylinux: '2_17' }
+          - { os: macos-13,       target: x86_64,  manylinux: '' }
+          - { os: macos-14,       target: aarch64, manylinux: '' }
+          - { os: windows-latest, target: x64,     manylinux: '' }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +63,6 @@ jobs:
         if: runner.os != 'Windows'
         uses: PyO3/maturin-action@v1
         with:
-          working-directory: black76
           target: ${{ matrix.target }}
           args: --release --out dist --interpreter '3.12'
           manylinux: ${{ matrix.manylinux }}
@@ -77,14 +71,13 @@ jobs:
         if: runner.os == 'Windows'
         uses: PyO3/maturin-action@v1
         with:
-          working-directory: black76
           target: ${{ matrix.target }}
           args: --release --out dist --interpreter '3.12'
           sccache: 'true'
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ runner.os }}-${{ matrix.target }}
-          path: black76/dist/*.whl
+          name: wheels-${{ matrix.os }}-${{ matrix.target }}
+          path: dist/*.whl
 
   # ---------- Build sdist ----------
   sdist:
@@ -95,15 +88,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: PyO3/maturin-action@v1
         with:
-          working-directory: black76
           command: sdist
           args: --out dist
       - uses: actions/upload-artifact@v4
         with:
           name: sdist
-          path: black76/dist/*.tar.gz
+          path: dist/*.tar.gz
 
-  # ---------- Publish to PyPI on tag push (vX.Y.Z) via OIDC trusted publishing ----------
+  # ---------- Publish to PyPI on `v*` tag push via OIDC trusted publishing ----------
   publish:
     name: Publish to PyPI
     if: startsWith(github.ref, 'refs/tags/v')
@@ -111,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/black76
+      url: https://pypi.org/p/opengreeks
     permissions:
       id-token: write
     steps:
