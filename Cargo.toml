@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = ["black76_rust", "bsm_rust"]
+# Future pure-Rust pricing model crates slot in here:
+#   "heston_rust",  "sabr_rust",  ...
+
+[package]
+name = "opengreeks-py"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "PyO3 bindings — Rust option pricing models exposed as the `opengreeks` Python package"
+license = "MIT"
+publish = false
+
+[lib]
+name = "_opengreeks"
+crate-type = ["cdylib"]
+
+[dependencies]
+black76_rust = { path = "black76_rust" }
+bsm_rust = { path = "bsm_rust" }
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py39"] }
+numpy = "0.22"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3

@@ -1,0 +1,14 @@
+[package]
+name = "bsm_rust"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Black-Scholes-Merton (and Black-Scholes via q=0) option pricing, Greeks, and IV. Reuses black76_rust's special functions."
+license = "MIT"
+
+[lib]
+name = "bsm_rust"
+crate-type = ["rlib"]
+
+[dependencies]
+black76_rust = { path = "../black76_rust" }

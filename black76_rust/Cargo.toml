@@ -1,0 +1,14 @@
+[package]
+name = "black76_rust"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Zero-dependency Black-76 option pricing, analytical Greeks, and implied volatility"
+license = "MIT"
+repository = "https://github.com/marketcalls/opengreeks"
+keywords = ["black76", "options", "quant", "volatility", "greeks"]
+categories = ["mathematics", "finance"]
+
+[lib]
+name = "black76_rust"
+crate-type = ["rlib"]

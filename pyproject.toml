@@ -1,0 +1,40 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "opengreeks"
+version = "0.1.0"
+description = "Fast options pricing, Greeks, and implied volatility for Black-76, Black-Scholes, and Black-Scholes-Merton. Rust core."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Rajandran R", email = "rajandran@marketcalls.in" }]
+maintainers = [{ name = "Marketcalls", email = "rajandran@marketcalls.in" }]
+requires-python = ">=3.9"
+keywords = ["options", "greeks", "implied-volatility", "black76", "black-scholes", "quant", "rust", "pyo3"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["numpy>=1.20"]
+
+[project.urls]
+Homepage = "https://github.com/marketcalls/opengreeks"
+Repository = "https://github.com/marketcalls/opengreeks"
+Issues = "https://github.com/marketcalls/opengreeks/issues"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "python"
+module-name = "opengreeks._opengreeks"
+strip = true

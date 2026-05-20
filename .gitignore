@@ -1,0 +1,63 @@
+# ──────────────────────────────────────────────────────────────────────────
+# Rust
+# ──────────────────────────────────────────────────────────────────────────
+target/
+**/target/
+
+# Per-crate lockfiles are ignored — the workspace root Cargo.lock is authoritative.
+# (Root Cargo.lock IS committed because we ship cdylib wheels.)
+/black76_rust/Cargo.lock
+/bsm_rust/Cargo.lock
+
+# ──────────────────────────────────────────────────────────────────────────
+# Python / maturin
+# ──────────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.egg-info/
+*.egg
+.eggs/
+
+# Maturin / build artifacts
+build/
+dist/
+wheels/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Testing / type-checking caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+
+# ──────────────────────────────────────────────────────────────────────────
+# OS / editor noise
+# ──────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# VS Code (keep .vscode/ if the team wants shared settings; right now we don't)
+.vscode/
+.VSCodeCounter/
+
+# JetBrains
+.idea/
+
+# ──────────────────────────────────────────────────────────────────────────
+# Local tooling
+# ──────────────────────────────────────────────────────────────────────────
+.claude/
