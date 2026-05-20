@@ -23,7 +23,7 @@ jobs:
       - name: cargo test (black76_rust + bsm_rust)
         run: cargo test --release -p black76_rust -p bsm_rust
 
-  # ---------- Parity test on Linux: build the wheel, install, run bench ----------
+  # ---------- Parity test on Linux: install package, run bench against py_vollib ----------
   parity-linux:
     name: Parity vs py_vollib (Linux)
     runs-on: ubuntu-latest
@@ -34,10 +34,10 @@ jobs:
         with: { python-version: '3.12' }
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Install maturin + baselines
-        run: pip install maturin 'py_vollib==1.0.1' 'py_lets_be_rational==1.0.1' numpy
-      - name: maturin develop
-        run: maturin develop --release
+      - name: Install baselines + build & install opengreeks
+        run: |
+          pip install 'py_vollib==1.0.1' 'py_lets_be_rational==1.0.1' numpy
+          pip install .
       - name: Run parity + bench
         run: python bench/bench_parity.py
 
