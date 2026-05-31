@@ -11,10 +11,12 @@ mod normal;
 mod pricing;
 mod greeks;
 mod iv;
+pub mod gbs2;
 
 pub use normal::{norm_cdf, norm_pdf, inverse_norm_cdf};
 pub use pricing::{black_price, undiscounted_black_price, d1, d2};
 pub use greeks::{delta, gamma, vega, theta, rho};
+pub use greeks::{vanna, charm, vomma, speed, zomma, color, veta, ultima, dual_delta, dual_gamma};
 pub use iv::{implied_volatility, IvError};
 
 /// Option type. `Call` ↔ `is_call = true`, `Put` ↔ `is_call = false`.

@@ -6,7 +6,7 @@ members = ["black76_rust", "bsm_rust"]
 
 [package]
 name = "opengreeks-py"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.75"
 description = "PyO3 bindings — Rust option pricing models exposed as the `opengreeks` Python package"

@@ -56,6 +56,39 @@ pub fn rho(f: f64, k: f64, sigma: f64, t: f64, r: f64, opt: OptionType) -> f64 {
     -t * black_price(f, k, sigma, t, r, opt) * 0.01
 }
 
+// ── Second- and third-order Greeks (Black-76 = generalized GBS with b = 0) ──
+// Raw / mathematical convention (exact partials, no scaling); τ-derivatives in
+// years. Each delegates to the shared `gbs2` engine with cost-of-carry b = 0
+// and the forward `f` as the underlying.
+macro_rules! b76_higher {
+    ($(#[$m:meta])* $name:ident) => {
+        $(#[$m])*
+        pub fn $name(f: f64, k: f64, sigma: f64, t: f64, r: f64, opt: OptionType) -> f64 {
+            crate::gbs2::$name(f, k, t, r, 0.0, sigma, opt)
+        }
+    };
+}
+b76_higher!(/// Black-76 vanna: ∂²/∂F∂σ. Same for call and put.
+    vanna);
+b76_higher!(/// Black-76 charm: ∂delta/∂τ (per year). Sign differs by option type.
+    charm);
+b76_higher!(/// Black-76 vomma (volga): ∂²/∂σ². Same for call and put.
+    vomma);
+b76_higher!(/// Black-76 speed: ∂gamma/∂F. Same for call and put.
+    speed);
+b76_higher!(/// Black-76 zomma: ∂gamma/∂σ. Same for call and put.
+    zomma);
+b76_higher!(/// Black-76 color: ∂gamma/∂τ (per year). Same for call and put.
+    color);
+b76_higher!(/// Black-76 veta: ∂vega/∂τ (per year). Same for call and put.
+    veta);
+b76_higher!(/// Black-76 ultima: ∂³/∂σ³. Same for call and put.
+    ultima);
+b76_higher!(/// Black-76 dual_delta: ∂/∂K. Sign differs by option type.
+    dual_delta);
+b76_higher!(/// Black-76 dual_gamma: ∂²/∂K². Same for call and put.
+    dual_gamma);
+
 #[cfg(test)]
 mod tests {
     use super::*;

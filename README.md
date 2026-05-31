@@ -12,6 +12,8 @@ pip install opengreeks
 
 OpenGreeks reimplements the Black-76, Black-Scholes, and Black-Scholes-Merton pricing paths in zero-dependency Rust, exposed through PyO3 with the **same function names and signatures** as `py_vollib` / `vollib`. Migration is a one-line import swap; the math is unchanged.
 
+And it goes further than vollib ever did: alongside the first-order Greeks, OpenGreeks ships a **complete second- and third-order Greek surface** — vanna, charm, vomma, speed, zomma, color, veta, ultima, dual delta, dual gamma — on **all three models**, each validated to ~1e-13 against automatic differentiation.
+
 ### Headline speedups vs `vollib==1.0.7` (latest canonical)
 
 | Workload | vollib 1.0.7 | OpenGreeks | Speedup |
@@ -116,6 +118,57 @@ deltas = black76.delta_array('c', F, K, t, 0.07, s)
 
 ---
 
+## Second- & third-order Greeks (what vollib never had)
+
+Risk that first-order Greeks miss — how your delta drifts as vol moves, where gamma is about to spike, how vega bleeds into expiry — lives in the higher-order Greeks. OpenGreeks exposes all of them, on **every model**, with the **same `(flag, F/S, K, t, r, sigma[, q])` signature** as the first-order Greeks:
+
+```python
+from opengreeks.black76 import vanna, charm, vomma, speed, zomma, color, veta, ultima
+
+F, K, t, r, sigma = 22000.0, 22000.0, 30/365, 0.07, 0.18
+vanna('c', F, K, t, r, sigma)   # ∂delta/∂σ  — how your delta moves when IV moves
+charm('c', F, K, t, r, sigma)   # ∂delta/∂τ  — delta bleed per year of time decay
+vomma('c', F, K, t, r, sigma)   # ∂vega/∂σ   — vega convexity (vol-of-vol exposure)
+```
+
+Every Greek has a NumPy batch twin (`vanna_array`, `charm_array`, …) for whole-chain analytics in a single call.
+
+| Greek | What it tells a trader | Definition |
+|---|---|---|
+| **vanna** | How delta shifts as IV moves (and how vega shifts as spot moves) | ∂²V/∂S∂σ |
+| **charm** | Delta decay — how your hedge drifts purely from time passing | ∂delta/∂τ |
+| **vomma** | Vega convexity — whether long-vol positions get longer as vol rises | ∂²V/∂σ² |
+| **speed** | How fast gamma changes with spot — gamma-of-gamma | ∂³V/∂S³ |
+| **zomma** | How gamma changes as IV moves | ∂gamma/∂σ |
+| **color** | Gamma decay — how gamma changes as expiry approaches | ∂gamma/∂τ |
+| **veta** | Vega decay — how vega bleeds with time | ∂vega/∂τ |
+| **ultima** | Sensitivity of vomma to vol — third-order vol risk | ∂³V/∂σ³ |
+| **dual delta** | Risk-neutral prob. of finishing ITM (strike sensitivity) | ∂V/∂K |
+| **dual gamma** | Density of the terminal price at the strike | ∂²V/∂K² |
+
+**Conventions:** raw mathematical partials (no per-day / per-1% rescaling); τ-derivatives (charm, color, veta) are per year of time-to-expiry. The same engine powers `opengreeks.black_scholes` and `opengreeks.black_scholes_merton`.
+
+### Validated against automatic differentiation
+
+`vollib` ships **no** second-order Greeks, so there is no library oracle to match. Instead every formula is checked against **autograd** automatic differentiation of the option price — exact partials, zero hand-derivation risk:
+
+| | max relative error vs autograd |
+|---|---|
+| **all 10 Greeks × 3 models** | **< 1.2e-13 — machine precision** |
+
+### Speed vs pure Python
+
+There is nothing in vollib to race against here, so the baseline is a hand-written pure-Python (`math`) implementation of the identical closed forms:
+
+| Workload | pure Python | OpenGreeks | Speedup |
+|---|---:|---:|---:|
+| Higher-order Greek — scalar call | ~0.7–1.1 µs | ~0.42 µs | ~2× |
+| Higher-order Greek — 177-strike chain (`*_array`) | ~95–165 µs | ~4–8 µs | **20–31×** |
+
+The batch path crosses the Python↔Rust boundary once and loops in native code — so a full chain of second-order Greeks costs single-digit microseconds. Reproduce with [`bench/bench_second_order.py`](bench/bench_second_order.py).
+
+---
+
 ## Migrating from py_vollib / vollib
 
 The function signatures are byte-identical. Migration is a one-line import swap.
@@ -177,7 +230,8 @@ OpenGreeks/                          # this monorepo
 ├── black76_rust/                    # pure-Rust Black-76 core (zero deps)
 ├── bsm_rust/                        # pure-Rust BSM (BS via q=0); depends on black76_rust
 ├── bench/
-│   ├── bench_parity.py              # parity + performance bench
+│   ├── bench_parity.py              # first-order parity + performance vs vollib
+│   ├── bench_second_order.py        # higher-order Greeks: autograd correctness + pure-Python speed
 │   └── RESULTS.md                   # full report
 └── .github/workflows/CI.yml         # cargo test + wheel matrix + PyPI publish
 ```
@@ -208,9 +262,13 @@ pip install target/wheels/opengreeks-*.whl
 # Rust crates
 cargo test --release
 
-# Python parity + performance bench
+# Python parity + performance bench (first-order, vs vollib)
 pip install 'vollib>=1.0.7' 'py_lets_be_rational>=1.0.1' numpy
 python bench/bench_parity.py
+
+# Second/third-order Greeks: correctness (autograd) + speed (vs pure Python)
+pip install autograd numpy
+python bench/bench_second_order.py
 ```
 
 ---

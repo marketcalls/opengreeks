@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "opengreeks"
-version = "0.1.0"
+version = "0.2.0"
 description = "Fast options pricing, Greeks, and implied volatility for Black-76, Black-Scholes, and Black-Scholes-Merton. Rust core."
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -80,6 +80,39 @@ pub fn rho(s: f64, k: f64, sigma: f64, t: f64, r: f64, q: f64, opt: OptionType) 
     q_sign * t * k * (-r * t).exp() * norm_cdf(q_sign * dd2) * 0.01
 }
 
+// ── Second- and third-order Greeks (BSM = generalized GBS with b = r - q) ──
+// Raw / mathematical convention (exact partials, no scaling); τ-derivatives in
+// years. BS (no dividend) is the q = 0 case. Each delegates to the shared
+// `black76_rust::gbs2` engine with cost-of-carry b = r - q and the spot `s`.
+macro_rules! bsm_higher {
+    ($(#[$m:meta])* $name:ident) => {
+        $(#[$m])*
+        pub fn $name(s: f64, k: f64, sigma: f64, t: f64, r: f64, q: f64, opt: OptionType) -> f64 {
+            black76_rust::gbs2::$name(s, k, t, r, r - q, sigma, opt)
+        }
+    };
+}
+bsm_higher!(/// BSM vanna: ∂²/∂S∂σ. Same for call and put.
+    vanna);
+bsm_higher!(/// BSM charm: ∂delta/∂τ (per year). Sign differs by option type.
+    charm);
+bsm_higher!(/// BSM vomma (volga): ∂²/∂σ². Same for call and put.
+    vomma);
+bsm_higher!(/// BSM speed: ∂gamma/∂S. Same for call and put.
+    speed);
+bsm_higher!(/// BSM zomma: ∂gamma/∂σ. Same for call and put.
+    zomma);
+bsm_higher!(/// BSM color: ∂gamma/∂τ (per year). Same for call and put.
+    color);
+bsm_higher!(/// BSM veta: ∂vega/∂τ (per year). Same for call and put.
+    veta);
+bsm_higher!(/// BSM ultima: ∂³/∂σ³. Same for call and put.
+    ultima);
+bsm_higher!(/// BSM dual_delta: ∂/∂K. Sign differs by option type.
+    dual_delta);
+bsm_higher!(/// BSM dual_gamma: ∂²/∂K². Same for call and put.
+    dual_gamma);
+
 /// BSM implied volatility. Inverts BSM price for σ via the F=S·e^((r-q)t) reduction
 /// to Black-76, reusing `black76_rust`'s Newton/bisection solver.
 pub fn implied_volatility(

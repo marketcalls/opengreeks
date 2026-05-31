@@ -5,6 +5,9 @@
 use black76_rust::{
     delta as rs_delta, gamma as rs_gamma, implied_volatility as rs_iv,
     black_price as rs_price, rho as rs_rho, theta as rs_theta, vega as rs_vega,
+    vanna as rs_vanna, charm as rs_charm, vomma as rs_vomma, speed as rs_speed,
+    zomma as rs_zomma, color as rs_color, veta as rs_veta, ultima as rs_ultima,
+    dual_delta as rs_dual_delta, dual_gamma as rs_dual_gamma,
     IvError, OptionType,
 };
 use bsm_rust as bsm;
@@ -65,6 +68,17 @@ greek_scalar!(black76_gamma, rs_gamma);
 greek_scalar!(black76_vega,  rs_vega);
 greek_scalar!(black76_theta, rs_theta);
 greek_scalar!(black76_rho,   rs_rho);
+// Second / third order
+greek_scalar!(black76_vanna,      rs_vanna);
+greek_scalar!(black76_charm,      rs_charm);
+greek_scalar!(black76_vomma,      rs_vomma);
+greek_scalar!(black76_speed,      rs_speed);
+greek_scalar!(black76_zomma,      rs_zomma);
+greek_scalar!(black76_color,      rs_color);
+greek_scalar!(black76_veta,       rs_veta);
+greek_scalar!(black76_ultima,     rs_ultima);
+greek_scalar!(black76_dual_delta, rs_dual_delta);
+greek_scalar!(black76_dual_gamma, rs_dual_gamma);
 
 // =============================================================================
 // Black-76 — batch / NumPy
@@ -137,6 +151,17 @@ greek_array!(black76_gamma_array, rs_gamma);
 greek_array!(black76_vega_array,  rs_vega);
 greek_array!(black76_theta_array, rs_theta);
 greek_array!(black76_rho_array,   rs_rho);
+// Second / third order
+greek_array!(black76_vanna_array,      rs_vanna);
+greek_array!(black76_charm_array,      rs_charm);
+greek_array!(black76_vomma_array,      rs_vomma);
+greek_array!(black76_speed_array,      rs_speed);
+greek_array!(black76_zomma_array,      rs_zomma);
+greek_array!(black76_color_array,      rs_color);
+greek_array!(black76_veta_array,       rs_veta);
+greek_array!(black76_ultima_array,     rs_ultima);
+greek_array!(black76_dual_delta_array, rs_dual_delta);
+greek_array!(black76_dual_gamma_array, rs_dual_gamma);
 
 #[pyfunction]
 #[pyo3(signature = (price, F, K, r, t, flag))]
@@ -205,6 +230,17 @@ bsm_greek_scalar!(bsm_gamma, bsm::gamma);
 bsm_greek_scalar!(bsm_vega,  bsm::vega);
 bsm_greek_scalar!(bsm_theta, bsm::theta);
 bsm_greek_scalar!(bsm_rho,   bsm::rho);
+// Second / third order
+bsm_greek_scalar!(bsm_vanna,      bsm::vanna);
+bsm_greek_scalar!(bsm_charm,      bsm::charm);
+bsm_greek_scalar!(bsm_vomma,      bsm::vomma);
+bsm_greek_scalar!(bsm_speed,      bsm::speed);
+bsm_greek_scalar!(bsm_zomma,      bsm::zomma);
+bsm_greek_scalar!(bsm_color,      bsm::color);
+bsm_greek_scalar!(bsm_veta,       bsm::veta);
+bsm_greek_scalar!(bsm_ultima,     bsm::ultima);
+bsm_greek_scalar!(bsm_dual_delta, bsm::dual_delta);
+bsm_greek_scalar!(bsm_dual_gamma, bsm::dual_gamma);
 
 // =============================================================================
 // Black-Scholes — BSM with q=0 (signatures without `q`)
@@ -242,6 +278,17 @@ bs_greek_scalar!(bs_gamma, bsm::gamma);
 bs_greek_scalar!(bs_vega,  bsm::vega);
 bs_greek_scalar!(bs_theta, bsm::theta);
 bs_greek_scalar!(bs_rho,   bsm::rho);
+// Second / third order
+bs_greek_scalar!(bs_vanna,      bsm::vanna);
+bs_greek_scalar!(bs_charm,      bsm::charm);
+bs_greek_scalar!(bs_vomma,      bsm::vomma);
+bs_greek_scalar!(bs_speed,      bsm::speed);
+bs_greek_scalar!(bs_zomma,      bsm::zomma);
+bs_greek_scalar!(bs_color,      bsm::color);
+bs_greek_scalar!(bs_veta,       bsm::veta);
+bs_greek_scalar!(bs_ultima,     bsm::ultima);
+bs_greek_scalar!(bs_dual_delta, bsm::dual_delta);
+bs_greek_scalar!(bs_dual_gamma, bsm::dual_gamma);
 
 // =============================================================================
 // BSM / BS — batch
@@ -308,6 +355,17 @@ bsm_greek_array!(bsm_gamma_array, bsm::gamma);
 bsm_greek_array!(bsm_vega_array,  bsm::vega);
 bsm_greek_array!(bsm_theta_array, bsm::theta);
 bsm_greek_array!(bsm_rho_array,   bsm::rho);
+// Second / third order
+bsm_greek_array!(bsm_vanna_array,      bsm::vanna);
+bsm_greek_array!(bsm_charm_array,      bsm::charm);
+bsm_greek_array!(bsm_vomma_array,      bsm::vomma);
+bsm_greek_array!(bsm_speed_array,      bsm::speed);
+bsm_greek_array!(bsm_zomma_array,      bsm::zomma);
+bsm_greek_array!(bsm_color_array,      bsm::color);
+bsm_greek_array!(bsm_veta_array,       bsm::veta);
+bsm_greek_array!(bsm_ultima_array,     bsm::ultima);
+bsm_greek_array!(bsm_dual_delta_array, bsm::dual_delta);
+bsm_greek_array!(bsm_dual_gamma_array, bsm::dual_gamma);
 
 #[pyfunction]
 #[pyo3(signature = (price, S, K, t, r, q, flag))]
@@ -368,6 +426,17 @@ bs_greek_array!(bs_gamma_array, bsm::gamma);
 bs_greek_array!(bs_vega_array,  bsm::vega);
 bs_greek_array!(bs_theta_array, bsm::theta);
 bs_greek_array!(bs_rho_array,   bsm::rho);
+// Second / third order
+bs_greek_array!(bs_vanna_array,      bsm::vanna);
+bs_greek_array!(bs_charm_array,      bsm::charm);
+bs_greek_array!(bs_vomma_array,      bsm::vomma);
+bs_greek_array!(bs_speed_array,      bsm::speed);
+bs_greek_array!(bs_zomma_array,      bsm::zomma);
+bs_greek_array!(bs_color_array,      bsm::color);
+bs_greek_array!(bs_veta_array,       bsm::veta);
+bs_greek_array!(bs_ultima_array,     bsm::ultima);
+bs_greek_array!(bs_dual_delta_array, bsm::dual_delta);
+bs_greek_array!(bs_dual_gamma_array, bsm::dual_gamma);
 
 #[pyfunction]
 #[pyo3(signature = (price, S, K, t, r, flag))]
@@ -401,6 +470,13 @@ fn bs_implied_volatility_array<'py>(
 // Module registration
 // =============================================================================
 
+/// Register one or more `#[pyfunction]`s on the module in a single call.
+macro_rules! reg {
+    ($m:expr, $($f:ident),+ $(,)?) => {
+        $( $m.add_function(wrap_pyfunction!($f, $m)?)?; )+
+    };
+}
+
 #[pymodule]
 fn _opengreeks(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Black-76 — scalar
@@ -419,6 +495,12 @@ fn _opengreeks(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(black76_vega_array, m)?)?;
     m.add_function(wrap_pyfunction!(black76_theta_array, m)?)?;
     m.add_function(wrap_pyfunction!(black76_rho_array, m)?)?;
+    // Black-76 — second / third order (scalar + batch)
+    reg!(m, black76_vanna, black76_charm, black76_vomma, black76_speed, black76_zomma,
+         black76_color, black76_veta, black76_ultima, black76_dual_delta, black76_dual_gamma);
+    reg!(m, black76_vanna_array, black76_charm_array, black76_vomma_array, black76_speed_array,
+         black76_zomma_array, black76_color_array, black76_veta_array, black76_ultima_array,
+         black76_dual_delta_array, black76_dual_gamma_array);
 
     // BSM — scalar
     m.add_function(wrap_pyfunction!(bsm_black_scholes_merton, m)?)?;
@@ -436,6 +518,11 @@ fn _opengreeks(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bsm_vega_array, m)?)?;
     m.add_function(wrap_pyfunction!(bsm_theta_array, m)?)?;
     m.add_function(wrap_pyfunction!(bsm_rho_array, m)?)?;
+    // BSM — second / third order (scalar + batch)
+    reg!(m, bsm_vanna, bsm_charm, bsm_vomma, bsm_speed, bsm_zomma,
+         bsm_color, bsm_veta, bsm_ultima, bsm_dual_delta, bsm_dual_gamma);
+    reg!(m, bsm_vanna_array, bsm_charm_array, bsm_vomma_array, bsm_speed_array, bsm_zomma_array,
+         bsm_color_array, bsm_veta_array, bsm_ultima_array, bsm_dual_delta_array, bsm_dual_gamma_array);
     // BS — scalar (BSM with q=0)
     m.add_function(wrap_pyfunction!(bs_black_scholes, m)?)?;
     m.add_function(wrap_pyfunction!(bs_implied_volatility, m)?)?;
@@ -452,6 +539,11 @@ fn _opengreeks(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bs_vega_array, m)?)?;
     m.add_function(wrap_pyfunction!(bs_theta_array, m)?)?;
     m.add_function(wrap_pyfunction!(bs_rho_array, m)?)?;
+    // BS — second / third order (scalar + batch)
+    reg!(m, bs_vanna, bs_charm, bs_vomma, bs_speed, bs_zomma,
+         bs_color, bs_veta, bs_ultima, bs_dual_delta, bs_dual_gamma);
+    reg!(m, bs_vanna_array, bs_charm_array, bs_vomma_array, bs_speed_array, bs_zomma_array,
+         bs_color_array, bs_veta_array, bs_ultima_array, bs_dual_delta_array, bs_dual_gamma_array);
 
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
     Ok(())
